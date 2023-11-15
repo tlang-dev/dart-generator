@@ -1,0 +1,82 @@
+expose generate
+
+use std.StrBuilder
+
+model {
+
+    let contentGen = {
+        elems: LangContent[] = [
+            LangImpl:LangContent = &genImpl(_, _),
+            LangFunc: LangFunc = &genFunc(_, _)
+        ]
+    }
+}
+
+helper {
+
+    func generate(code: LangBlock): String {
+    let str: StrBuilder.StrBuilder = {}
+    //genPackage(str, code.content.package)
+        genImports(str, code.content.uses)
+        genContents(str, code.content.contents)
+        str.toString()
+    //"Hello world of Dart generator !"
+    }
+
+    func genPackage(str: StrBuilder.StrBuilder, package: LangPkg) {
+        str.add("import ")
+        for(part in package.parts) {
+            if(_i != 0) {
+                str.add(".")
+            }
+            str.add(part)
+        }
+    }
+
+    func genImports(str: StrBuilder.StrBuilder, uses: LangUse[]) {
+        for(import in uses) {
+            genImport(str, import)
+            str.ln()
+        }
+    }
+
+    func genContents(str: StrBuilder.StrBuilder, contents: LangContent[]) {
+        for(content in contents) {
+            genContent(str, content)
+        }
+    }
+
+    func genContent(str: StrBuilder.StrBuilder, content: LangContent) {
+        contentGen.elems[content.type]._(str, content)
+    }
+
+    func genImport(str: StrBuilder.StrBuilder, import: LangUse) {
+        str.add("import ")
+        for(part in import.parts) {
+            if(_i != 0) {
+                str.add(".")
+            }
+            str.add(part)
+        }
+    }
+
+    func genImpl(str: StrBuilder.StrBuilder, langImpl: LangImpl) {
+        str.add("class ")
+        str.add(langImpl.name)
+        str.add(" {")
+                genContents(str, )
+        str.ln()
+        str.add("}")
+        str.ln()
+    }
+
+    func genFunc(str: StrBuilder.StrBuilder, langFunc: LangFunc) {
+        str.add("fun ")
+        str.add(langFunc.name)
+        str.add(" {")
+        str.ln()
+        str.add("}")
+        str.ln()
+    }
+
+}

@@ -1,0 +1,9 @@
+name: Dart
+project: Generator
+organisation: TLang
+version: 1.0.0
+stability: alpha
+releaseNumber: 1
+main: Dart
+dependencies:
+  - TLang/Std/StrBuilder 1.0.0:alpha:1 std
