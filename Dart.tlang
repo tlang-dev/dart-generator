@@ -1,13 +1,19 @@
 expose generate
 
 use std.StrBuilder
+use io.Terminal
 
 model {
 
     let contentGen = {
         elems: LangContent[] = [
             LangImpl:LangContent = &genImpl(_, _),
-            LangFunc: LangFunc = &genFunc(_, _)
+            LangFunc: LangFunc = &genFunc(_, _),
+            LangReturn: LangReturn = &genReturn(_, _),
+            LangExprBlock: LangExprBlock = &genExprBlock(_, _),
+            LangOperation: LangOperation = &genOperation(_, _),
+            LangCallObj: LangCallObj = &genCallObj(_, _),
+            LangEntity: LangEntity = &genEntity(_, _)
         ]
     }
 }
@@ -15,28 +21,28 @@ model {
 helper {
 
     func generate(code: LangBlock): String {
+
+        Terminal.println("generate DART")
     let str: StrBuilder.StrBuilder = {}
-    //genPackage(str, code.content.package)
         genImports(str, code.content.uses)
         genContents(str, code.content.contents)
         str.toString()
-    //"Hello world of Dart generator !"
-    }
-
-    func genPackage(str: StrBuilder.StrBuilder, package: LangPkg) {
-        str.add("import ")
-        for(part in package.parts) {
-            if(_i != 0) {
-                str.add(".")
-            }
-            str.add(part)
-        }
     }
 
     func genImports(str: StrBuilder.StrBuilder, uses: LangUse[]) {
         for(import in uses) {
             genImport(str, import)
             str.ln()
+        }
+    }
+
+    func genImport(str: StrBuilder.StrBuilder, import: LangUse) {
+        str.add("import ")
+        for(part in import.parts) {
+            if(_i != 0) {
+                str.add(".")
+            }
+            str.add(part)
         }
     }
 
@@ -50,22 +56,12 @@ helper {
         contentGen.elems[content.type]._(str, content)
     }
 
-    func genImport(str: StrBuilder.StrBuilder, import: LangUse) {
-        str.add("import ")
-        for(part in import.parts) {
-            if(_i != 0) {
-                str.add(".")
-            }
-            str.add(part)
-        }
-    }
-
     func genImpl(str: StrBuilder.StrBuilder, langImpl: LangImpl) {
         str.add("class ")
         str.add(langImpl.name)
         str.add(" {")
-                genContents(str, )
         str.ln()
+        genContents(str, langImpl.contents)
         str.add("}")
         str.ln()
     }
@@ -73,10 +69,39 @@ helper {
     func genFunc(str: StrBuilder.StrBuilder, langFunc: LangFunc) {
         str.add("fun ")
         str.add(langFunc.name)
-        str.add(" {")
+    //        str.add(" {")
+    //        str.ln()
+        genContent(str, langFunc.content)
+    //        str.add("}")
         str.ln()
+    }
+
+    func genExprBlock(str: StrBuilder.StrBuilder, langExprBlock: LangExprBlock){
+        str.add("{")
+        str.ln()
+        genContents(str, langExprBlock.exprs)
         str.add("}")
         str.ln()
     }
 
+    func genReturn(str: StrBuilder.StrBuilder, langReturn: LangReturn) {
+        str.add("return ")
+    //            str.add(langReturn.value)
+        genContent(str, langReturn.operation)
+        str.add(";")
+        str.ln()
+    }
+
+    func genOperation(str: StrBuilder.StrBuilder, langOperation: LangOperation) {
+        genContent(str, langOperation.content)
+    }
+
+    func genCallObj(str: StrBuilder.StrBuilder, langCallObj: LangCallObj) {
+        genContent(str, langCallObj.firstCall)
+    }
+
+    func genEntity(str: StrBuilder.StrBuilder, langEntity: LangEntity) {
+        str.add(langEntity.name)
+        str.add("()")
+    }
 }

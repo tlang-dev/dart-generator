@@ -7,3 +7,4 @@ releaseNumber: 1
 main: Dart
 dependencies:
   - TLang/Std/StrBuilder 1.0.0:alpha:1 std
+  - TLang/IO/Terminal 1.0.0:alpha:1 io
